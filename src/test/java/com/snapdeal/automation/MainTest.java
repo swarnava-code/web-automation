@@ -16,8 +16,8 @@ import java.time.Duration;
 import java.util.Set;
 
 class MainTest {
-    static String FB_USER_NAME = "Enter your username here";
-    static String FB_PASSWORD = "Enter your password here";
+    private static String FB_USER_NAME = "Enter your username";
+    private static String FB_PASSWORD = "Enter your password";
     public static void main(String[] args) throws InterruptedException, AWTException {
         String baseUrl = "https://www.snapdeal.com";
         String productName = "KnoX Sanitizers 600 mL Pack of 6";
@@ -49,6 +49,7 @@ class MainTest {
         driver.findElement(By.id("add-cart-button-id")).click();
         //Thread.sleep(5000);
         driver.findElement(By.cssSelector("a[class='btn marR5']")).click();
+        String snapdealWindow = driver.getWindowHandle();
         driver.findElement(By.id("fblogin")).click();
         //Thread.sleep(4000);
         Set<String> driverWindowHandles = driver.getWindowHandles();
@@ -60,9 +61,15 @@ class MainTest {
                 break;
             }
         }
-        System.out.println(driver.getCurrentUrl());
-        Thread.sleep(3000);
-        driver.close();
-        driver.quit();
+        driver.switchTo().window(snapdealWindow);
+        Thread.sleep(10000);
+        for (int i = 0; i < 30; i++) {
+            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+        }
+        driver.findElement(By.id("make-payment")).click();
+        Thread.sleep(1000);
+        for (int i = 0; i < 10; i++) {
+            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+        }
     }
 }
