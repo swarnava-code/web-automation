@@ -18,7 +18,6 @@ class MainTest {
     private static String FB_PASSWORD = new TesterCredentials().getPASSWORD(); //assign your fb password
     static WebDriver driver;
 
-
     public static void main(String[] args) throws InterruptedException {
         String baseUrl = "https://www.snapdeal.com";
         String productName = "KnoX Sanitizers 600 mL Pack of 6";
@@ -44,9 +43,6 @@ class MainTest {
         String productLink = productAnchorTag.getAttribute("href");
         driver.get(productLink);
         humanPresence();
-//        for (int i = 0; i < 10; i++) {
-//            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
-//        }
         driver.findElement(By.id("add-cart-button-id")).click();
         humanPresence();
         driver.findElement(By.cssSelector("a[class='btn marR5']")).click();
@@ -64,11 +60,9 @@ class MainTest {
         for (String windowHandle : driverWindowHandles) {
             if(!driver.getWindowHandle().equals(windowHandle)){
                 driver.switchTo().window(windowHandle);
-                humanPresence();
                 driver.findElement(By.id("email")).sendKeys(FB_USER_NAME);
                 humanPresence();
                 driver.findElement(By.id("pass")).sendKeys(FB_PASSWORD, Keys.ENTER);
-                humanPresence();
                 break;
             }
         }
@@ -78,23 +72,21 @@ class MainTest {
                 ExpectedConditions.visibilityOfElementLocated(By.id("make-payment"))
         );
         if(makePayment.isDisplayed()){
-//            for (int i = 0; i < 20; i++) {
-//                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
-//            }
+            humanPresence();
+            pressArrowDown(10);
             humanPresence();
             driver.findElement(By.id("make-payment")).click();
-//            for (int i = 0; i < 10; i++) {
-//                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
-//            }
+            humanPresence();
+            pressArrowDown(5);
         }
         humanPresence();
-        //driver.close();
-        //driver.quit();
+        driver.close();
+        driver.quit();
     }
     static void humanPresence() throws InterruptedException {
-        boolean isHumanPresence = false;
+        boolean isHumanPresence = true;
         if(isHumanPresence){
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         }
     }
     static void pressArrowDown(Integer time){
