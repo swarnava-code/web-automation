@@ -4,12 +4,9 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.locators.RelativeLocator;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.time.Duration;
 import java.util.Set;
 
@@ -17,7 +14,6 @@ class MainTest {
     private static String FB_USER_NAME = new TesterCredentials().getUSERNAME(); //assign your fb username
     private static String FB_PASSWORD = new TesterCredentials().getPASSWORD(); //assign your fb password
     static WebDriver driver;
-
     public static void main(String[] args) throws InterruptedException {
         String baseUrl = "https://www.snapdeal.com";
         String productName = "KnoX Sanitizers 600 mL Pack of 6";
@@ -31,22 +27,28 @@ class MainTest {
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(100));
         driver.get(baseUrl);
         driver.manage().window().maximize();
-        humanPresence();
+        callingThreadOrNot();
         driver.findElement(By.name("keyword")).sendKeys(productName, Keys.ENTER);
-        humanPresence();
+        callingThreadOrNot();
         driver.findElement(By.xpath("//input[@placeholder='Enter your pincode']")).sendKeys(pincode);
-        humanPresence();
+        callingThreadOrNot();
         driver.findElement(By.xpath("//button[@class='pincode-check']")).click();
-        humanPresence();
-        pressArrowDown(10); //mandatory to find element
+        callingThreadOrNot();
+        for (int i = 0; i < 10; i++) {
+            //mandatory to find element
+            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+        }
         WebElement productAnchorTag = driver.findElement(By.partialLinkText(productName));
         String productLink = productAnchorTag.getAttribute("href");
         driver.get(productLink);
-        humanPresence();
+        callingThreadOrNot();
+        for (int i = 0; i < 10; i++) {
+            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+        }
         driver.findElement(By.id("add-cart-button-id")).click();
-        humanPresence();
+        callingThreadOrNot();
         driver.findElement(By.cssSelector("a[class='btn marR5']")).click();
-        humanPresence();
+        callingThreadOrNot();
         String snapdealWindow = driver.getWindowHandle();
         WebDriverWait webDriverWait = new WebDriverWait(driver, 30);
         WebElement loginFB = webDriverWait.until(
@@ -54,44 +56,45 @@ class MainTest {
         );
         if(loginFB.isDisplayed()){
             loginFB.click();
-            humanPresence();
+            callingThreadOrNot();
         }
         Set<String> driverWindowHandles = driver.getWindowHandles();
         for (String windowHandle : driverWindowHandles) {
             if(!driver.getWindowHandle().equals(windowHandle)){
                 driver.switchTo().window(windowHandle);
+                callingThreadOrNot();
                 driver.findElement(By.id("email")).sendKeys(FB_USER_NAME);
-                humanPresence();
+                callingThreadOrNot();
                 driver.findElement(By.id("pass")).sendKeys(FB_PASSWORD, Keys.ENTER);
+                callingThreadOrNot();
                 break;
             }
         }
         driver.switchTo().window(snapdealWindow);
-        humanPresence();
+        callingThreadOrNot();
         WebElement makePayment = webDriverWait.until(
                 ExpectedConditions.visibilityOfElementLocated(By.id("make-payment"))
         );
         if(makePayment.isDisplayed()){
-            humanPresence();
-            pressArrowDown(10);
-            humanPresence();
+            callingThreadOrNot();
+            for (int i = 0; i < 20; i++) {
+                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+            }
+            callingThreadOrNot();
             driver.findElement(By.id("make-payment")).click();
-            humanPresence();
-            pressArrowDown(5);
+            callingThreadOrNot();
+            for (int i = 0; i < 10; i++) {
+                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+            }
         }
-        humanPresence();
+        callingThreadOrNot();
         driver.close();
         driver.quit();
     }
-    static void humanPresence() throws InterruptedException {
-        boolean isHumanPresence = true;
+    static void callingThreadOrNot() throws InterruptedException {
+        boolean isHumanPresence = false;
         if(isHumanPresence){
-            Thread.sleep(3000);
-        }
-    }
-    static void pressArrowDown(Integer time){
-        for (int i = 0; i < time; i++) {
-            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+            Thread.sleep(2000);
         }
     }
 }
