@@ -11,89 +11,88 @@ import java.time.Duration;
 import java.util.Set;
 
 class MainTest {
-    private static String FB_USER_NAME = new TesterCredentials().getUSERNAME(); //assign your fb username
-    private static String FB_PASSWORD = new TesterCredentials().getPASSWORD(); //assign your fb password
+    private static final String FB_USER_NAME = new TesterCredentials().getUSERNAME(); //assign your fb username
+    private static final String FB_PASSWORD = new TesterCredentials().getPASSWORD(); //assign your fb password
+    static final boolean IS_HUMAN_PRESENCE = true;
+    static final String BASE_URL = "https://www.snapdeal.com";
+    static final String PRODUCT_NAME = "VIPPO VBH-658 BLUE FRENZY HEADPHONE"; //KnoX Sanitizers 600 mL Pack of 6  //VIPPO VBH-658 BLUE FRENZY HEADPHONE  //Dog Choke Chain Collar
+    static String pincode = "700018";
     static WebDriver driver;
+
     public static void main(String[] args) throws InterruptedException {
-        String baseUrl = "https://www.snapdeal.com";
-        String productName = "KnoX Sanitizers 600 mL Pack of 6";
-        String pincode = "700018";
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE);
+        chromeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
         WebDriverManager.chromedriver().driverVersion("97.0.4692.71").setup();
         driver = new ChromeDriver(chromeOptions);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().timeouts().scriptTimeout(Duration.ofMinutes(2));
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(100));
-        driver.get(baseUrl);
+        driver.get(BASE_URL);
         driver.manage().window().maximize();
-        callingThreadOrNot();
-        driver.findElement(By.name("keyword")).sendKeys(productName, Keys.ENTER);
-        callingThreadOrNot();
+        isThreadSleepRequired();
+        driver.findElement(By.name("keyword")).sendKeys(PRODUCT_NAME, Keys.ENTER);
+        isThreadSleepRequired();
         driver.findElement(By.xpath("//input[@placeholder='Enter your pincode']")).sendKeys(pincode);
-        callingThreadOrNot();
+        isThreadSleepRequired();
         driver.findElement(By.xpath("//button[@class='pincode-check']")).click();
-        callingThreadOrNot();
+        isThreadSleepRequired();
         for (int i = 0; i < 10; i++) {
-            //mandatory to find element
-            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
+            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN); //mandatory scroll to find element
         }
-        WebElement productAnchorTag = driver.findElement(By.partialLinkText(productName));
+        WebElement productAnchorTag = driver.findElement(By.partialLinkText(PRODUCT_NAME));
         String productLink = productAnchorTag.getAttribute("href");
         driver.get(productLink);
-        callingThreadOrNot();
-        for (int i = 0; i < 10; i++) {
-            driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
-        }
+        isThreadSleepRequired();
+        isScrollRequired();
         driver.findElement(By.id("add-cart-button-id")).click();
-        callingThreadOrNot();
-        driver.findElement(By.cssSelector("a[class='btn marR5']")).click();
-        callingThreadOrNot();
+        isThreadSleepRequired();
+        WebElement proceedToCheckout = driver.findElement(By.cssSelector("a[class='btn marR5']"));
+        proceedToCheckout.click();
+        isThreadSleepRequired();
         String snapdealWindow = driver.getWindowHandle();
         WebDriverWait webDriverWait = new WebDriverWait(driver, 30);
-        WebElement loginFB = webDriverWait.until(
-                ExpectedConditions.visibilityOfElementLocated(By.id("fblogin"))
-        );
-        if(loginFB.isDisplayed()){
-            loginFB.click();
-            callingThreadOrNot();
-        }
+        WebElement loginFB = driver.findElement(By.id("fblogin"));
+        loginFB.click();
         Set<String> driverWindowHandles = driver.getWindowHandles();
         for (String windowHandle : driverWindowHandles) {
             if(!driver.getWindowHandle().equals(windowHandle)){
                 driver.switchTo().window(windowHandle);
-                callingThreadOrNot();
+                isThreadSleepRequired();
                 driver.findElement(By.id("email")).sendKeys(FB_USER_NAME);
-                callingThreadOrNot();
+                isThreadSleepRequired();
                 driver.findElement(By.id("pass")).sendKeys(FB_PASSWORD, Keys.ENTER);
-                callingThreadOrNot();
+                isThreadSleepRequired();
                 break;
             }
         }
         driver.switchTo().window(snapdealWindow);
-        callingThreadOrNot();
+        isThreadSleepRequired();
         WebElement makePayment = webDriverWait.until(
                 ExpectedConditions.visibilityOfElementLocated(By.id("make-payment"))
         );
-        if(makePayment.isDisplayed()){
-            callingThreadOrNot();
-            for (int i = 0; i < 20; i++) {
-                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
-            }
-            callingThreadOrNot();
+        if(makePayment.isDisplayed()) {
+            isThreadSleepRequired();
+            isScrollRequired();
+            isThreadSleepRequired();
             driver.findElement(By.id("make-payment")).click();
-            callingThreadOrNot();
-            for (int i = 0; i < 10; i++) {
-                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);
-            }
+            isThreadSleepRequired();
+            isScrollRequired();
         }
-        callingThreadOrNot();
+        isThreadSleepRequired();
         driver.close();
         driver.quit();
     }
-    static void callingThreadOrNot() throws InterruptedException {
-        boolean isHumanPresence = false;
-        if(isHumanPresence){
+
+    static void isScrollRequired() {
+        if(IS_HUMAN_PRESENCE){
+            for (int i = 0; i < 10; i++) {
+                driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_DOWN);//
+            }
+        }
+    }
+
+    static void isThreadSleepRequired() throws InterruptedException {
+        if(IS_HUMAN_PRESENCE){
             Thread.sleep(2000);
         }
     }
